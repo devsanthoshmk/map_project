@@ -26,9 +26,10 @@ def main_data(driver,urls):
     n=0
     while n<len(urls):
         url=urls[n]
-        l=[]
+        
         driver.get(url)
         while True:
+            l=[]
             try:
                 print(driver.find_element(By.XPATH, '//h1[@class="DUwDvf lfPIob"]').text)
                 l.append(driver.find_element(By.XPATH, '//h1[@class="DUwDvf lfPIob"]').text.strip())#name
