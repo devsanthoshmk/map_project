@@ -1,6 +1,7 @@
 import time
 st=time.time()
 import multiprocessing
+import threading
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import StaleElementReferenceException,TimeoutException
@@ -21,8 +22,8 @@ def main_window(urls):
     driver.implicitly_wait(30)
     main_data(driver,urls)
 
-def main_data(driver,urls):
-    print(len(urls))
+def threadin(urls,driver):
+    print(urls)
     n=0
     while n<len(urls):
         url=urls[n]
@@ -82,13 +83,20 @@ def main_data(driver,urls):
                     print("staled")
         n+=1
     driver.quit()
+
+
+def main_data(driver,urls):
+    t1=threading.Thread(target=threadin,args=(urls[:len(urls)//2],driver))
+    t1.start()
+    threadin(urls[len(urls)//2:],driver=driver)
+    t1.join()
     
 
 
 loc=input("Enter input(eg: gift shop in vandavasi) : ")#"ayurvedic doctor in thoraipakkam" 
-# headOption = webdriver.FirefoxOptions()
-# headOption.add_argument("--headless")
-driver = webdriver.Firefox()#options=headOption)
+headOption = webdriver.FirefoxOptions()
+headOption.add_argument("--headless")
+driver = webdriver.Firefox(options=headOption)
 print("...")
 driver.get(f"https://www.google.com/maps/search/{loc.strip().replace(' ' ,'+')}/@13.0208721,80.1231215,13z/data=!3m1!4b1?entry=ttu")
 #driver.implicitly_wait(30)
