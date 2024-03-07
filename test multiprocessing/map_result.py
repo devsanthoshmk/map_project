@@ -1,7 +1,7 @@
+#NOT TESTED
 import time
 st=time.time()
 import multiprocessing
-import threading
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import StaleElementReferenceException,TimeoutException
@@ -22,7 +22,7 @@ def main_window(urls):
     driver.implicitly_wait(30)
     main_data(driver,urls)
 
-def threadin(urls,driver):
+def main_data(driver,urls):
     print(urls)
     n=0
     while n<len(urls):
@@ -84,12 +84,6 @@ def threadin(urls,driver):
         n+=1
     driver.quit()
 
-
-def main_data(driver,urls):
-    t1=threading.Thread(target=threadin,args=(urls[:len(urls)//2],driver))
-    t1.start()
-    threadin(urls[len(urls)//2:],driver=driver)
-    t1.join()
     
 
 
@@ -120,16 +114,17 @@ with multiprocessing.Manager() as manager:
     
     data=manager.list([["NAME","TYPE","STATUS","RATING","PHONE NO.","ADDRESS","LINK"]])
     workers=split_work(urls,multiprocessing.cpu_count())
-    lock=multiprocessing.Lock()
-    p1=multiprocessing.Process(target=main_data,args=(driver,workers.pop(0)))
+    worker1=workers.pop(0)
+    #p1=multiprocessing.Process(target=main_data,args=(driver,workers.pop(0)))
     for sub_urls in workers:
         p2=multiprocessing.Process(target=main_window,args=(sub_urls,))
-    p1.start()
-    p2.start()
-    p1.join()
+        p2.start()
+    # p1.start()
+    main_data(driver,worker1)
+    # p1.join()
     p2.join()
 
-    with open(f"results in {loc.split()[-1]}.csv",'w') as r:
+    with open(f"results in {loc}.csv",'w') as r:
         writer=csv.writer(r)
         writer.writerows(data)
     r.close()
